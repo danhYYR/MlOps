@@ -1,6 +1,9 @@
+### Start ###
 # Resource group
 rg_name     = "demomlops"
 rg_location = "eastasia"
+enviroment  = "dev"
+### STOP EXPORT ###
 # Vnet define
 Vnet_Workspace = {
   address_prefixes = ["172.0.0.0/16"]
