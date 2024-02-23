@@ -45,6 +45,7 @@ resource "random_string" "myrandom" {
 resource "azurerm_resource_group" "demomlops" {
   name     = var.rg_name
   location = var.rg_location
+  tags     = { "${var.enviroment}" : "${var.rg_name}" }
 }
 
 ## Vnet
@@ -60,8 +61,8 @@ module "vnet" {
   mli_address           = local.mli_address
 }
 # Service Principal
-module "ServicePrincipal" {
-  source  = "./modules/ServicePrincipal"
+module "serviceprincipal" {
+  source  = "./modules/serviceprincipal"
   vnet_id = module.vnet.cp_subnet_id
   aks_id  = module.aks-cluster.aks_id
   sp_name = "aks-sp"
@@ -110,4 +111,16 @@ module "mlworkspace" {
   mlc_vm_size     = var.mlc_vm_size
   subnet_mli      = module.vnet.mli_subnet_id
   ssh_key         = var.ssh_key
+}
+# Self-Host Config
+module "selfhost" {
+  source         = "./modules/self_host"
+  rg_name        = var.rg_name
+  rg_location    = var.rg_location
+  dns_aml_id     = module.vnet.dns_aml_id
+  dns_notbook_id = module.vnet.dns_notbook_id
+  mlw_id         = module.mlworkspace.mlw_id
+  subnet_sh      = module.vnet.jp_subnet_id
+  jumphost_data  = module.jumhost.jumphost_data
+
 }
