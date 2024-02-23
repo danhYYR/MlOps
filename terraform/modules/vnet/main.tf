@@ -54,7 +54,7 @@ resource "azurerm_subnet" "mli" {
 }
 ## Public IP
 resource "azurerm_public_ip" "demovnet_pulicIP" {
-    name = "${var.rg_name}-mydemoPulicIP"
+    name = "${var.rg_name}-IP"
     resource_group_name = var.rg_name
     location = var.rg_location
     allocation_method = "Static"
