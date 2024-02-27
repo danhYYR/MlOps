@@ -1,0 +1,13 @@
+all:
+  hosts:
+    jumphost:
+      ansible_host: "{{ IP_address }}"
+      ansible_ssh_private_key_file: {{ssh_key_file}}
+      ansible_user: "{{admin_username}}"
+  # Add more hosts or groups as needed
+## Variables define
+  vars:
+    aks_name: {{aks_name}}
+    rg_name: {{rg_name}}
+    rg_location: {{rg_location}}
+    tenant_id: {{ lookup('ansible.builtin.env', 'TENANT_ID')|default('nobody', True) }} 

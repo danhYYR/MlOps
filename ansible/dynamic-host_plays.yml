@@ -1,0 +1,16 @@
+- name: Setup hosts config
+  hosts: localhost 
+  gather_facts: false 
+  vars:
+    local_file: "config/inventory_tf.yml"
+  tasks:
+    - name: Set variable for ansible playbook
+      ansible.builtin.set_fact:
+        inventory_file: "{{local_file}}"
+    - name: Generate inventory content
+      template:
+        src: "../template/ansible-config/hosts_template.j2"
+        dest: "{{ inventory_file }}"
+    - name: Debug the host inventory file
+      debug:
+        msg: "{{ lookup('file', '{{inventory_file}}') | from_yaml }}"
