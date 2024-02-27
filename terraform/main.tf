@@ -117,10 +117,10 @@ module "selfhost" {
   source         = "./modules/self_host"
   rg_name        = var.rg_name
   rg_location    = var.rg_location
+  aks_name       = var.aks_name
   dns_aml_id     = module.vnet.dns_aml_id
   dns_notbook_id = module.vnet.dns_notbook_id
   mlw_id         = module.mlworkspace.mlw_id
   subnet_sh      = module.vnet.jp_subnet_id
   jumphost_data  = module.jumhost.jumphost_data
-
 }

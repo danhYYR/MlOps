@@ -4,8 +4,8 @@ resource "azurerm_private_endpoint" "mlw-sh-pe" {
   resource_group_name = var.rg_name
   subnet_id           = var.subnet_sh
   private_service_connection {
-    name                           = "${azurerm_machine_learning_workspace.demoml.name}-pe"
-    private_connection_resource_id = azurerm_machine_learning_workspace.demoml.id
+    name                           = "sh-pe"
+    private_connection_resource_id = var.mlw_id
     is_manual_connection           = false
     subresource_names              = ["amlworkspace"]
   }
@@ -14,9 +14,18 @@ resource "azurerm_private_endpoint" "mlw-sh-pe" {
     private_dns_zone_ids = [var.dns_aml_id, var.dns_notbook_id]
   }
 }
-
-# resource "null_resource" "inventory_config" {
-#   provisioner "local-exec" {
-#     command = " "
-#   }
-# }
+// Prepare Ansible Inventory
+resource "local_file" "inventory_variable" {
+  filename = "${path.cwd}/${path.module}/variable_file.yml"
+  content  = local.ansible_vars
+}
+resource "null_resource" "inventory_config" {
+  provisioner "local-exec" {
+    command = <<-EOT
+      ${local.ansible_workspace}
+      ${local.ansible_cmd}
+    EOT
+  }
+  triggers = {always_run = timestamp()}
+  depends_on = [local_file.inventory_variable]
+}

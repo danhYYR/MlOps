@@ -35,3 +35,8 @@ variable "jumphost_data" {
     ssh_key  = string
   })
 }
+# AKS 
+variable "aks_name" {
+  description = "The name of AKS"
+  type = string
+}
