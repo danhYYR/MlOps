@@ -13,3 +13,5 @@ terraform/cmd
 .ssh
 # Config Ansible
 ansible/config
+# Raw database
+db/
