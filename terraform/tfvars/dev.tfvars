@@ -43,3 +43,4 @@ storage_account = {
   tier             = "Standard"
   replication_type = "LRS"
 }
+inventory_path = "../ansible/config/inventory_tf.yml"

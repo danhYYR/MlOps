@@ -13,12 +13,17 @@ terraform {
       source  = "hashicorp/random"
       version = "~> 3.0"
     }
+    local = {
+      source = "hashicorp/local"
+      version = "2.4.1"
+    }
+    null = {
+      source = "hashicorp/null"
+      version = "3.2.2"
+    }
   }
   backend "azurerm" {
-    # resource_group_name   = var.grp_name
-    # storage_account_name  = var.sa_name
-    # container_name        = var.sa_container_name
-    # key                   = var.sa_key
+    // Backend Config
   }
   required_version = ">=1.0.0"
 }
@@ -39,7 +44,6 @@ resource "random_string" "myrandom" {
   special = false
   numeric = false
 }
-
 # Resource
 ## Resource Group
 resource "azurerm_resource_group" "demomlops" {
@@ -80,7 +84,7 @@ module "aks-cluster" {
   client_secret = var.sp_secret
 }
 ## JumpHostVM
-module "jumhost" {
+module "jumphost" {
   source         = "./modules/jumphost"
   rg_name        = azurerm_resource_group.demomlops.name
   rg_location    = azurerm_resource_group.demomlops.location
@@ -122,5 +126,6 @@ module "selfhost" {
   dns_notbook_id = module.vnet.dns_notbook_id
   mlw_id         = module.mlworkspace.mlw_id
   subnet_sh      = module.vnet.jp_subnet_id
-  jumphost_data  = module.jumhost.jumphost_data
+  jumphost_data  = module.jumphost.jumphost_data
+  inventory_path = var.inventory_path
 }

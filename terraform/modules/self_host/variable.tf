@@ -40,3 +40,8 @@ variable "aks_name" {
   description = "The name of AKS"
   type = string
 }
+# Ansible
+variable "inventory_path" {
+  description = "The path of iventory for Ansible"
+  type = string
+}

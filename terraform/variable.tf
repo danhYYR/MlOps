@@ -110,3 +110,10 @@ variable "mlc_vm_priority" {
   description = "The priority of VM"
   default     = "LowPriority"
 }
+# Configuration
+# Ansible
+variable "inventory_path" {
+  description = "The path of iventory for Ansible"
+  type = string
+  default = "config/inventory_local.yml"
+}

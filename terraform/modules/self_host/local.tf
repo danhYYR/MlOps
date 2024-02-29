@@ -1,12 +1,15 @@
 # Extract the jumphost information
 locals {
+  jp_name       = lookup(var.jumphost_data, "name", "jumphost")
   jp_IP         = lookup(var.jumphost_data, "hostname", "127.0.0.1")
   jp_admin_name = lookup(var.jumphost_data, "username", "127.0.0.1")
   jp_ssh_key    = lookup(var.jumphost_data, "ssh_key", "127.0.0.1")
 }
 # Prepare the Ansible Variable file
-locals{
-  ansible_vars=<<-EOT
+locals {
+  ansible_vars = <<-EOT
+    # Local Inventory path
+    local_file: "${path.cwd}/${var.inventory_path}"
     # JumpHost Variable
     IP_address: "${local.jp_IP}"
     ssh_key_file: "${local.jp_ssh_key}"
@@ -42,4 +45,18 @@ locals {
   ansible_cmd = <<EOT
     ansible-playbook dynamic-host_plays.yml --extra-var "@${local_file.inventory_variable.filename}"
   EOT
+}
+// Setup for dynamic inventory template
+locals {
+  inventory_azure = <<-EOT
+    plugin: azure_rm
+    include_vm_resource_groups:
+      - "${var.rg_name}"
+    conditional_groups:
+      "${local.jp_name}": "'${local.jp_name}' in computer_name"
+    auth_source: cli
+    hostvar_expressions:
+      ansible_ssh_private_key_file: "'${local.jp_ssh_key}'"
+      ansible_user: "'${local.jp_admin_name}'"
+EOT
 }

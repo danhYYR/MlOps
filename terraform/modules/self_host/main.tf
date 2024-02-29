@@ -19,6 +19,10 @@ resource "local_file" "inventory_variable" {
   filename = "${path.cwd}/${path.module}/variable_file.yml"
   content  = local.ansible_vars
 }
+resource "local_sensitive_file" "inventory_azure" {
+  filename = "${path.cwd}/../ansible/config/dynamic_azure_rm.yml"
+  content = local.inventory_azure
+}
 resource "null_resource" "inventory_config" {
   provisioner "local-exec" {
     command = <<-EOT
