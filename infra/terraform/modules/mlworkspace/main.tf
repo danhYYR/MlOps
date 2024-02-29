@@ -101,7 +101,9 @@ resource "azurerm_machine_learning_compute_instance" "demo-mli" {
   location                      = var.rg_location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.demoml.id
   virtual_machine_size          = "STANDARD_DS2_V2"
-  authorization_type            = "personal"
+  identity {
+    type = "SystemAssigned"
+  }
   ssh {
     public_key = file(var.ssh_key)
   }

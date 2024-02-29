@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-demo
+  namespace: webapp
+  labels:
+    app: django-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      name: django-demo
+      namespace: webapp
+      labels: 
+        app: django-app
+    spec:
+      containers:
+        - name: webapp
+          image: dnguyen332/djangowebapp:web
+          command: ["/bin/sh","-c"]
+          args:
+            - |
+              python patientencode/manage.py runserver 0.0.0.0:8000;
+              python patientencode/manage.py migrate;
+          envFrom:
+            - configMapRef:
+                name: envars-demo
+            - secretRef:
+                name: postgres-credentials  
+          ports:
+            - containerPort: 8000
+            - containerPort: 5432
+      initContainers:
+      - name: check-db
+        image: postgres:latest
+        envFrom:
+        - configMapRef:
+            name: envars-demo
+        command: ['sh', '-c', 'until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER; do echo waiting for database; sleep 2; done;']

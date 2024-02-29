@@ -22,7 +22,7 @@ resource "azurerm_role_assignment" "aks-vnet" {
 }
 
 resource "azurerm_role_assignment" "sp-role" {
-    scope = var.aks_id
+    scope = var.rg_id
     principal_id = data.azuread_service_principal.pipeline-sp.object_id
     role_definition_name = "Contributor"
 }

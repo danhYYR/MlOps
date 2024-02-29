@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-demo
+  namespace: webapp
+  labels:
+    app: postgres-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-db
+  template:
+    metadata:
+      name: postgres-demo
+      namespace: webapp
+      labels:
+        app: postgres-db
+    spec:
+      containers:
+      - name: postgres-db
+        image: postgres:latest
+        envFrom:
+        - configMapRef:
+            name: envars-demo
+        - secretRef:
+            name: postgres-credentials
+        ports:
+        - containerPort: 5432

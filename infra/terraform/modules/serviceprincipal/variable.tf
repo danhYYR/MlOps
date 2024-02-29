@@ -1,7 +1,7 @@
 # Vnet
 ## Cluster Vnet
-variable "aks_id" {
-    description = "The ID for the Vnet assigned cluster"
+variable "rg_id" {
+    description = "The ID for the Resource group for assigned all resource on this one"
     type = string
 }
 ## Vnet for AKS

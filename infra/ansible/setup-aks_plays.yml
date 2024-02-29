@@ -1,0 +1,65 @@
+## Retrieve the keyvault value
+- name: Deploy AKS Cluster using Azure CLI
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get the Enviroment variables
+      ansible.builtin.set_fact:
+        vault_uri: "{{lookup('ansible.builtin.env','vault_uri')}}"
+        vault_sp_id: "{{lookup('ansible.builtin.env','vault_client_id')}}"
+        vault_sp_secret: "{{lookup('ansible.builtin.env','vault_client_secret')}}"
+
+    - name: Get Service Principal from Key Vault
+      azure.azcollection.azure_rm_keyvaultsecret_info:
+        vault_uri: "{{vault_uri}}"
+        name: "{{item}}"
+      loop:
+        - "{{vault_sp_id}}"
+        - "{{vault_sp_secret}}"
+      register: keyvaultsecret_info
+
+    - name: Assign variables for the Client 
+      ansible.builtin.set_fact:
+        client_id: "{{keyvaultsecret_info.results[0].secrets[0].secret}}"
+        client_secret: "{{keyvaultsecret_info.results[1].secrets[0].secret}}"
+    - name: Validate the Service Principal
+      ansible.builtin.debug:
+        msg: "ID: {{client_id}} and pass: {{client_secret}}"
+## Config the AKS Credential
+- name: Get the AKS Credential
+  hosts: jumphost
+  gather_facts: false
+  tasks:
+    - name: Debug the variables
+      ansible.builtin.debug:
+        msg: "AKS Cluster: {{aks_name}} in the rg: {{rg_name}} in the tenant {{tenant_id}}"
+    - name: Set the Service Principal
+      ansible.builtin.set_fact:
+        client_id: "{{hostvars['localhost']['client_id']}}"
+        client_secret: "{{hostvars['localhost']['client_secret']}}"
+
+    - name: Azure Login with Service Principal
+      ansible.builtin.shell:
+        cmd: 'az login --service-principal -u {{client_id}} -p {{client_secret}} --tenant {{tenant_id}}'
+        executable: /bin/bash
+
+    - name: Get the AKS Credential
+      ansible.builtin.shell:
+        cmd: 'az aks get-credentials --admin --name {{aks_name}} --resource-group {{rg_name}} --overwrite-existing'
+        executable: /bin/bash
+## Copy the manifest to the jumphost VM
+- name: Prepare the AKS Manifest
+  hosts: jumphost  # Replace 'jumphost' with the actual hostname or group for your jump host
+  gather_facts: false
+  tasks:
+    - name: Copy AKS Manifest and Deployment Script
+      ansible.builtin.copy:
+        src: "../aks-define"
+        dest: "~/demo"
+      register: copy_result
+
+    - name: Copy Deployment Script
+      ansible.builtin.copy:
+        src: "../scripts/deploypod.sh"
+        dest: "~/demo/scripts/"
+      register: script_copy_result

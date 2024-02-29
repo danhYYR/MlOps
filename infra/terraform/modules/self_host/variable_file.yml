@@ -1,0 +1,11 @@
+# Local Inventory path
+local_file: "/home/azureuser/demo/mlops-demo/terraform/../ansible/config/inventory_tf.yml"
+# JumpHost Variable
+IP_address: "13.75.116.118"
+ssh_key_file: "~/.ssh/id_mlops"
+admin_username: "admin_jp"
+# AKS Variable
+aks_name: "aks-demo"
+# Global variable
+rg_name: "demomlops"
+rg_location: "eastasia"

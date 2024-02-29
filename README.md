@@ -2,7 +2,7 @@
 
 # Infrastructure
 
-[!Initial Infra](https://microsoft.github.io/azureml-ops-accelerator/3-Deploy/azure-machine-learning-terraform/media/architecture_aml_pl.png)
+![Initial Infra](https://microsoft.github.io/azureml-ops-accelerator/3-Deploy/azure-machine-learning-terraform/media/architecture_aml_pl.png)
 
 In this infrastructure, the machine learning workspace have the moderate sercure with custom virtual network. Initial, the infra include:
 <ul>

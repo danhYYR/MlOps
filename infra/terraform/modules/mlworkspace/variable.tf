@@ -12,6 +12,10 @@ variable "rg_location" {
   description = "The Resource Group location"
   type        = string
 }
+variable "sp_resource_id" {
+  description = "The reousrce ID of pipeline service principal"
+  type = string
+}
 # MLWorkspace dependencies
 ## Application Insight
 variable "app_name" {

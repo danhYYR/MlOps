@@ -9,6 +9,9 @@ output "tennet_id" {
 output "client_id" {
   value = data.azuread_service_principal.pipeline-sp.client_id
 }
+output "sp_resource_id" {
+  value = data.azuread_service_principal.pipeline-sp.id
+}
 # output "client_secret" {
 #   value = azuread_service_principal_password.demo-sp-pass.value
 # }

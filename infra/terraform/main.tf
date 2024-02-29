@@ -14,11 +14,11 @@ terraform {
       version = "~> 3.0"
     }
     local = {
-      source = "hashicorp/local"
+      source  = "hashicorp/local"
       version = "2.4.1"
     }
     null = {
-      source = "hashicorp/null"
+      source  = "hashicorp/null"
       version = "3.2.2"
     }
   }
@@ -68,7 +68,7 @@ module "vnet" {
 module "serviceprincipal" {
   source  = "./modules/serviceprincipal"
   vnet_id = module.vnet.cp_subnet_id
-  aks_id  = module.aks-cluster.aks_id
+  rg_id   = azurerm_resource_group.demomlops.id
   sp_name = "aks-sp"
   sp_id   = var.sp_id
 }
@@ -99,6 +99,7 @@ module "mlworkspace" {
   tenant_id       = var.tenant_id
   rg_name         = azurerm_resource_group.demomlops.name
   rg_location     = azurerm_resource_group.demomlops.location
+  sp_resource_id  = module.serviceprincipal.sp_resource_id
   app_name        = local.mlw_ai_name
   app_type        = local.mlw_ai_type
   kv_name         = "${local.mlw_kv_name}-${random_string.myrandom.id}"

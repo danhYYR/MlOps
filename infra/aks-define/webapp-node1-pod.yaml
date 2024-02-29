@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: django-demo-node1
+  namespace: webapp
+  labels: 
+    app: django-app
+spec:
+  nodeSelector:
+    worker: "1"
+  containers:
+    - name: webapp
+      image: dnguyen332/djangowebapp:web
+      command: ["python","patientencode/manage.py","runserver","0.0.0.0:8000"]
+      envFrom:
+        - configMapRef:
+            name: envars-demo
+        - secretRef:
+            name: postgres-credentials
+      ports:
+        - containerPort: 8000
+        - containerPort: 5432
+  initContainers:
+  - name: check-db
+    image: postgres:latest
+    envFrom:
+    - configMapRef:
+        name: envars-demo
+    command: ['sh', '-c', 'until pg_isready -h $POSTGRES_HOST -p $POSTGRES_PORT -U $POSTGRES_USER; do echo waiting for database; sleep 2; done;']
