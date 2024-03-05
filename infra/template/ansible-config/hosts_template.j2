@@ -1,9 +1,13 @@
 all:
   hosts:
-    jumphost:
-      ansible_host: "{{ IP_address }}"
-      ansible_ssh_private_key_file: {{ssh_key_file}}
-      ansible_user: "{{admin_username}}"
+    {{jpvm}}:
+      ansible_host: "{{ jp_IP }}"
+      ansible_ssh_private_key_file: {{jp_ssh_key}}
+      ansible_user: "{{jp_admin_name}}"
+    {{dsvm}}:
+      ansible_host: "{{ dsvm_IP }}"
+      ansible_ssh_private_key_file: {{dsvm_ssh_key}}
+      ansible_user: "{{dsvm_admin_name}}"
   # Add more hosts or groups as needed
 ## Variables define
   vars:
