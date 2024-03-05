@@ -29,6 +29,7 @@ resource "null_resource" "inventory_config" {
       ${local.ansible_workspace}
       ${local.ansible_cmd}
     EOT
+    quiet = true
   }
   triggers = {always_run = timestamp()}
   depends_on = [local_file.inventory_variable]

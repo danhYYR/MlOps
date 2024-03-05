@@ -1,9 +1,15 @@
 # Extract the jumphost information
 locals {
-  jp_name       = lookup(var.jumphost_data, "name", "jumphost")
+  // JPVM
+  jp_name       = lookup(var.jumphost_data, "vmname", "jumphost")
   jp_IP         = lookup(var.jumphost_data, "hostname", "127.0.0.1")
   jp_admin_name = lookup(var.jumphost_data, "username", "127.0.0.1")
   jp_ssh_key    = lookup(var.jumphost_data, "ssh_key", "127.0.0.1")
+  // DSVM
+  dsvm_name       = lookup(var.dsvm_data, "vmname", "jumphost")
+  dsvm_IP         = lookup(var.dsvm_data, "hostname", "127.0.0.1")
+  dsvm_admin_name = lookup(var.dsvm_data, "username", "127.0.0.1")
+  dsvm_ssh_key    = lookup(var.dsvm_data, "ssh_key", "127.0.0.1")
 }
 # Prepare the Ansible Variable file
 locals {
@@ -11,9 +17,15 @@ locals {
     # Local Inventory path
     local_file: "${path.cwd}/${var.inventory_path}"
     # JumpHost Variable
-    IP_address: "${local.jp_IP}"
-    ssh_key_file: "${local.jp_ssh_key}"
-    admin_username: "${local.jp_admin_name}"
+    jpvm: "${local.jp_name}"
+    jp_IP: "${local.jp_IP}"
+    jp_ssh_key: "${local.jp_ssh_key}"
+    jp_admin_name: "${local.jp_admin_name}"
+    # DSVM Variable
+    dsvm: "${local.dsvm_name}"
+    dsvm_IP: "${local.dsvm_IP}"
+    dsvm_ssh_key: "${local.dsvm_ssh_key}"
+    dsvm_admin_name: "${local.dsvm_admin_name}"
     # AKS Variable
     aks_name: "${var.aks_name}"
     # Global variable
@@ -54,6 +66,7 @@ locals {
       - "${var.rg_name}"
     conditional_groups:
       "${local.jp_name}": "'${local.jp_name}' in computer_name"
+      "${local.dsvm_name}": "'${local.dsvm_name}' in computer_name"
     auth_source: cli
     hostvar_expressions:
       ansible_ssh_private_key_file: "'${local.jp_ssh_key}'"
