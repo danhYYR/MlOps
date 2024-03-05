@@ -26,6 +26,10 @@ variable "jp_vm_address" {
   description = "The subnet address of Jump Host VM"
   type = list(string)
 }
+variable "list_vm" {
+  description = "The list VM"
+  type = list(string)
+}
 ## Machine Learning Workspace
 variable "mlc_address" {
   description = "The Machine Learning Cluster's address space"

@@ -7,12 +7,8 @@ output vnet_ws_id {
   value       = azurerm_virtual_network.demovnet_workspace.id
 }
 output publicip_id{
-    description = "The pulic IP "
-    value = azurerm_public_ip.demovnet_pulicIP.id
-}
-output publicip_ipaddress{
-    description = "The pulic IP address"
-    value = azurerm_public_ip.demovnet_pulicIP.ip_address
+    description = "The pulic IP id map for list VM"
+    value = {for i,vm in var.list_vm : vm =>azurerm_public_ip.demovnet_pulicIP[i].id}
 }
 # AKS-Subnet
 output cp_subnet_id {

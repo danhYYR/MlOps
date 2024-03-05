@@ -54,7 +54,8 @@ resource "azurerm_subnet" "mli" {
 }
 ## Public IP
 resource "azurerm_public_ip" "demovnet_pulicIP" {
-    name = "${var.rg_name}-IP"
+    count = length(var.list_vm)
+    name = "${var.list_vm[count.index]}-IP"
     resource_group_name = var.rg_name
     location = var.rg_location
     allocation_method = "Static"
