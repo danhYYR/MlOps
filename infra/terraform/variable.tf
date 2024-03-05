@@ -51,7 +51,7 @@ variable "aks_name" {
   type        = string
   default     = "demoaks"
 }
-# JumpHost VM
+# Control VM
 variable "admin_username" {
   description = "Admin username for the VM"
   type        = string
@@ -59,6 +59,10 @@ variable "admin_username" {
 }
 variable "ssh_key" {
   description = "SSH public key for authentication"
+}
+variable "control_vm_map" {
+  description = "The Defination for VM on control subnet"
+  type = any
 }
 # Service Principal
 variable "sp_id" {
@@ -111,9 +115,20 @@ variable "mlc_vm_priority" {
   default     = "LowPriority"
 }
 # Configuration
-# Ansible
+## Self host VM
+variable "selfhostvm" {
+  description = "The information of Self host VM"
+  type = object({
+    rg       = string
+    location = string
+    vm_name  = string
+    vnet     = string
+    subnet   = string
+  })
+}
+## Ansible
 variable "inventory_path" {
   description = "The path of iventory for Ansible"
-  type = string
-  default = "config/inventory_local.yml"
+  type        = string
+  default     = "config/inventory_local.yml"
 }

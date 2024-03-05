@@ -52,12 +52,15 @@ resource "azurerm_resource_group" "demomlops" {
   tags     = { "${var.enviroment}" : "${var.rg_name}" }
 }
 
-## Vnet
-module "vnet" {
-  source                = "./modules/vnet"
+## Network
+### Self host Vnet
+### Vnet
+module "network" {
+  source                = "./modules/network"
   rg_name               = azurerm_resource_group.demomlops.name
   rg_location           = azurerm_resource_group.demomlops.location
   vnet_wokspace_address = local.vnet_workspace_address
+  list_vm               = keys(var.control_vm_map)
   aks_cp_address        = local.aks_cp_address
   aks_node_address      = local.aks_node_address
   jp_vm_address         = local.jp_vm_address
@@ -67,7 +70,7 @@ module "vnet" {
 # Service Principal
 module "serviceprincipal" {
   source  = "./modules/serviceprincipal"
-  vnet_id = module.vnet.cp_subnet_id
+  vnet_id = module.network.cp_subnet_id
   rg_id   = azurerm_resource_group.demomlops.id
   sp_name = "aks-sp"
   sp_id   = var.sp_id
@@ -78,21 +81,22 @@ module "aks-cluster" {
   rg_name       = azurerm_resource_group.demomlops.name
   rg_location   = azurerm_resource_group.demomlops.location
   aks_name      = var.aks_name
-  subnet_cp     = module.vnet.cp_subnet_id
-  subnet_node   = module.vnet.node_subnet_id
+  subnet_cp     = module.network.cp_subnet_id
+  subnet_node   = module.network.node_subnet_id
   client_id     = var.sp_id
   client_secret = var.sp_secret
 }
-## JumpHostVM
-module "jumphost" {
-  source         = "./modules/jumphost"
+## Control VM
+module "vm_list" {
+  source         = "./modules/controlvm"
   rg_name        = azurerm_resource_group.demomlops.name
   rg_location    = azurerm_resource_group.demomlops.location
   admin_username = var.admin_username
   ssh_key        = var.ssh_key
-  vnet_subnet_id = module.vnet.jp_subnet_id
-  publicip_id    = module.vnet.publicip_id
-  depends_on     = [azurerm_resource_group.demomlops, module.vnet]
+  vnet_subnet_id = module.network.jp_subnet_id
+  publicip_id    = module.network.publicip_id
+  control_vm_map = var.control_vm_map
+  depends_on     = [azurerm_resource_group.demomlops, module.network]
 }
 module "mlworkspace" {
   source          = "./modules/mlworkspace"
@@ -108,25 +112,31 @@ module "mlworkspace" {
   sa_rt           = local.mlw_sa_rt
   sa_tier         = local.mlw_sa_tier
   mlw_name        = var.mlw_name
-  subnet_mlw      = module.vnet.jp_subnet_id
-  dns_aml_id      = module.vnet.dns_aml_id
-  dns_notbook_id  = module.vnet.dns_notbook_id
+  subnet_mlw      = module.network.jp_subnet_id
+  dns_aml_id      = module.network.dns_aml_id
+  dns_notbook_id  = module.network.dns_notbook_id
   mlc_name        = var.mlc_name
   mlc_vm_priority = var.mlc_vm_priority
   mlc_vm_size     = var.mlc_vm_size
-  subnet_mli      = module.vnet.mli_subnet_id
+  subnet_mli      = module.network.mli_subnet_id
   ssh_key         = var.ssh_key
 }
 # Self-Host Config
+data "azurerm_subnet" "selfhost_snet" {
+  resource_group_name  = local.sh_rg
+  virtual_network_name = local.sh_vnet
+  name                 = local.sh_snet
+}
 module "selfhost" {
   source         = "./modules/self_host"
-  rg_name        = var.rg_name
-  rg_location    = var.rg_location
+  rg_name        = local.sh_rg
+  rg_location    = local.sh_location
   aks_name       = var.aks_name
-  dns_aml_id     = module.vnet.dns_aml_id
-  dns_notbook_id = module.vnet.dns_notbook_id
+  dns_aml_id     = module.network.dns_aml_id
+  dns_notbook_id = module.network.dns_notbook_id
   mlw_id         = module.mlworkspace.mlw_id
-  subnet_sh      = module.vnet.jp_subnet_id
-  jumphost_data  = module.jumphost.jumphost_data
+  subnet_sh      = data.azurerm_subnet.selfhost_snet.id
+  jumphost_data  = module.vm_list.linux_vm_data["jpvm"]
+  dsvm_data      = module.vm_list.windows_vm_data["dsvm"]
   inventory_path = var.inventory_path
 }
