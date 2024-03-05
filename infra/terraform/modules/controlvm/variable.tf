@@ -14,7 +14,7 @@ variable "vnet_subnet_id" {
 }
 variable "publicip_id" {
   description = "The public IP for access throughout ssh key"
-  type = string
+  type = map(string)
 }
 # VM
 variable "VM_conf" {
@@ -27,6 +27,13 @@ variable "VM_conf" {
         "os_disk_size_gb" = 30
         "os_type" = "Linux" 
     }
+}
+variable "control_vm_map" {
+  description = "The defination of control VM list"
+  type = object({
+    jpvm = map(string)
+    dsvm = map(string)
+  })
 }
 variable "admin_username" {
   description = "Admin username for the VM"
